@@ -43,6 +43,16 @@ function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {default: obj};
 }
 
+const preserveSymlinks = true;
+/**
+ * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ *
+ */
+
 function defaultResolver(path, options) {
   const resolve = options.browser
     ? (_browserResolve || _load_browserResolve()).default.sync
@@ -56,14 +66,6 @@ function defaultResolver(path, options) {
     rootDir: options.rootDir
   });
 }
-/**
- * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- *
- */
 
 const REGEX_RELATIVE_IMPORT = /^(?:\.\.?(?:\/|$)|\/|([A-Za-z]:)?[\\\/])/;
 
@@ -120,11 +122,11 @@ function resolveSync(target, options) {
     if (isDirectory(dir)) {
       result = resolveAsFile(name) || resolveAsDirectory(name);
     }
-    // if (result) {
-    //   // Dereference symlinks to ensure we don't create a separate
-    //   // module instance depending on how it was referenced.
-    //   result = (_fs || _load_fs()).default.realpathSync(result);
-    // }
+    if (result && !preserveSymlinks) {
+      // Dereference symlinks to ensure we don't create a separate
+      // module instance depending on how it was referenced.
+      result = (_fs || _load_fs()).default.realpathSync(result);
+    }
     return result;
   }
 
